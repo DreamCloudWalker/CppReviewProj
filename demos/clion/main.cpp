@@ -2,6 +2,8 @@
 #include <memory>
 #include <string>
 #include "utils/test_shared_ptr.h"
+#include "utils/simple_ring_buffer.h"
+
 using namespace std;
 
 class B;
@@ -53,9 +55,27 @@ void test_loop_ref()
     cout << "wp2 reference number: " << wp2.use_count() << "\n";// 没有内存泄露，打印如下，wp2 reference number:0
 }
 
+void test_ring_buffer() {
+    SimpleRingBuffer<int> ringBuffer(5);
+    ringBuffer.push(1);
+    ringBuffer.push(2);
+    ringBuffer.push(3);
+    ringBuffer.push(4);
+    for (int i = 0; i < 4 ; i++)
+        cout << ringBuffer.pop() << endl;
+    ringBuffer.push(5);
+    ringBuffer.push(5);
+    ringBuffer.push(5);
+    cout << ringBuffer.pop() << endl;
+    cout << ringBuffer.pop() << endl;
+    cout << ringBuffer.pop() << endl;
+//    cout << ringBuffer.pop() << endl;
+}
+
 int main() {
     //std::weak_ptr 用来避免 std::shared_ptr 的循环引用
     test_loop_ref();
+    test_ring_buffer();
 
     return 0;
 }

@@ -3,4 +3,4 @@ project(clion)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(clion main.cpp utils/test_shared_ptr.h)
+add_executable(clion main.cpp utils/test_shared_ptr.h utils/simple_ring_buffer.h)
