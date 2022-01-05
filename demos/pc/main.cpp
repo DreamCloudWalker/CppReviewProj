@@ -159,6 +159,8 @@ void handleFfmpegOperations() {
     // 分配解码后的数据存储位置
     AVPacket *av_packet = av_packet_alloc();
     AVFrame *av_frame = av_frame_alloc();
+    // used later to handle quit event
+    SDL_Event event;
 
     // 读帧
     while (true) {
@@ -204,6 +206,19 @@ void handleFfmpegOperations() {
             SDL_RenderCopy(sdl_renderer, sdl_texture, nullptr, nullptr);
             SDL_RenderPresent(sdl_renderer);    // 显示，将渲染器上下文中的数据，渲染到关联窗体上去
             SDL_Delay(40); // 防止显示过快
+
+            // handle Ctrl + C event
+            SDL_PollEvent(&event);
+            switch (event.type) {
+                case SDL_QUIT: {
+                    SDL_Quit();
+                    exit(0);
+                }
+                default: {
+                    // nothing to do
+                    break;
+                }
+            }
         }
     }
 }
