@@ -2,7 +2,8 @@
 #include <memory>
 
 extern "C" {
-#include <SDL2/SDL.h>
+#include <SDL.h>
+#include <SDL2/SDL_image.h>
 }
 
 #include <string>
@@ -11,7 +12,9 @@ extern "C" {
 
 using namespace std;
 
-const int WIDTH = 640, HEIGHT = 480; // SDL窗口的宽和高
+const int WIDTH = 720, HEIGHT = 1280; // SDL窗口的宽和高
+SDL_Surface *imageSurface = nullptr;   // 申明用于加载图片的SDL_Surface
+SDL_Surface *windowSurface = nullptr;  // 申明用于窗体相关的SDL_Surface
 
 class B;
 
@@ -86,17 +89,30 @@ SDL_Window* init_sdl_window() {
     }
     SDL_Window *window = SDL_CreateWindow("Hello SDL!",
                                           SDL_WINDOWPOS_CENTERED,
-                                          SDL_WINDOWPOS_CENTERED, WIDTH,
+                                          SDL_WINDOWPOS_CENTERED,
+                                          WIDTH,
                                           HEIGHT,
                                           SDL_WINDOW_ALLOW_HIGHDPI); // 创建SDL窗口
     if (nullptr == window) {
         cout << "SDL could not create window with error: " << SDL_GetError() << endl;
+        return window;
+    }
+
+    if (!(IMG_Init(IMG_INIT_JPG) & IMG_INIT_JPG)) {
+        cout << "SDL_image could not init with error: " << IMG_GetError() << endl;
+        return window;
+    }
+
+    windowSurface = SDL_GetWindowSurface(window);
+    imageSurface = IMG_Load("tifa.jpeg");
+    if (nullptr == imageSurface) {
+        cout << "SDL could not load image with error: " << SDL_GetError() << endl;
     }
 
     return window;
 }
 
-void loop_sdl_window() {
+void loop_sdl_window(SDL_Window * window) {
     SDL_Event window_event; // SDL窗口事件
     while(true) {
         if (SDL_PollEvent(&window_event)) { // 对当前待处理事件进行轮询。
@@ -105,10 +121,14 @@ void loop_sdl_window() {
                 break;
             }
         }
+        SDL_BlitSurface(imageSurface, nullptr, windowSurface, nullptr);
+        SDL_UpdateWindowSurface(window);
     }
 }
 
 void destroy_sdl_window(SDL_Window * window) {
+    imageSurface = nullptr;
+    windowSurface = nullptr;
     SDL_DestroyWindow(window); // 推出SDL窗体
     SDL_Quit(); // SDL推出
 }
@@ -118,8 +138,9 @@ int main() {
     test_loop_ref();
     test_ring_buffer();
 
+    // SDL2 part
     SDL_Window *window = init_sdl_window();
-    loop_sdl_window();
+    loop_sdl_window(window);
     destroy_sdl_window(window);
 
     return 0;
