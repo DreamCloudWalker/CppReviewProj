@@ -24,6 +24,7 @@ static AVCodecContext *av_codec_ctx_video = nullptr;
 static int index_stream_video = -1;
 static int width_video = 1280;
 static int height_video = 720;
+static double fps_video = 25;
 
 // SDL2
 SDL_Renderer *sdl_renderer;
@@ -143,6 +144,7 @@ void initFfmpeg() {
             av_fmt_ctx, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
     width_video = av_fmt_ctx->streams[index_stream_video]->codecpar->width;
     height_video = av_fmt_ctx->streams[index_stream_video]->codecpar->height;
+    fps_video = av_q2d(av_fmt_ctx->streams[index_stream_video]->r_frame_rate);
 
     // 找到并打开解码器
     av_codec_video = avcodec_find_decoder(av_fmt_ctx->streams[index_stream_video]->codecpar->codec_id);
@@ -161,6 +163,7 @@ void handleFfmpegOperations() {
     AVFrame *av_frame = av_frame_alloc();
     // used later to handle quit event
     SDL_Event event;
+    double sleep_time = 1.0 / (double)fps_video;
 
     // 读帧
     while (true) {
@@ -205,7 +208,7 @@ void handleFfmpegOperations() {
             // 纹理复制给渲染器，srcrect=NULL则表示整个纹理。dstrect=NULL表示整个渲染整个渲染区域
             SDL_RenderCopy(sdl_renderer, sdl_texture, nullptr, nullptr);
             SDL_RenderPresent(sdl_renderer);    // 显示，将渲染器上下文中的数据，渲染到关联窗体上去
-            SDL_Delay(40); // 防止显示过快
+            SDL_Delay((uint32_t)(1000 * sleep_time) - 10); // 根据fps调整视频播放速率
 
             // handle Ctrl + C event
             SDL_PollEvent(&event);
