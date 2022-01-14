@@ -1,3 +1,6 @@
+//
+// Created by 邓健 on 2022/1/14.
+//
 #include <iostream>
 #include <memory>
 #include <map>
@@ -9,10 +12,6 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libswscale/swscale.h>
 }
-
-#include <string>
-#include "../../lib/utils/test_shared_ptr.h"
-#include "../../lib/utils/simple_ring_buffer.h"
 
 using namespace std;
 
@@ -30,73 +29,6 @@ static double fps_video = 25;
 SDL_Renderer *sdl_renderer;
 SDL_Texture *sdl_texture;
 SDL_Window *sdl_window;
-
-class B;
-
-class A {
-public:
-    test_shared_ptr<class B> m_spB;
-};
-
-class B {
-public:
-    test_shared_ptr<class A> m_spA;
-};
-
-class D;
-
-class C {
-public:
-    weak_ptr<class D> m_wpD;
-};
-
-class D {
-public:
-    weak_ptr<class C> m_wpC;
-};
-
-void test_loop_ref() {
-    test_shared_ptr<class A> wp1;
-    {
-        test_shared_ptr<class A> pA(new A());
-        test_shared_ptr<class B> pB(new B());
-
-        pA->m_spB = pB;
-        pB->m_spA = pA;
-
-        wp1 = pA;
-    }   // 触发pA和pB的析构
-    cout << "wp1 reference number: " << wp1.use_count() << "\n";// 存在内存泄露
-
-    weak_ptr<class C> wp2;
-    {
-        auto pC = make_shared<class C>();
-        auto pD = make_shared<class D>();
-
-        pC->m_wpD = pD;
-        pD->m_wpC = pC;
-
-        wp2 = pC;
-    }
-    cout << "wp2 reference number: " << wp2.use_count() << "\n";// 没有内存泄露，打印如下，wp2 reference number:0
-}
-
-void test_ring_buffer() {
-    SimpleRingBuffer<int> ringBuffer(5);
-    ringBuffer.push(1);
-    ringBuffer.push(2);
-    ringBuffer.push(3);
-    ringBuffer.push(4);
-    for (int i = 0; i < 4; i++)
-        cout << ringBuffer.pop() << endl;
-    ringBuffer.push(5);
-    ringBuffer.push(5);
-    ringBuffer.push(5);
-    cout << ringBuffer.pop() << endl;
-    cout << ringBuffer.pop() << endl;
-    cout << ringBuffer.pop() << endl;
-//    cout << ringBuffer.pop() << endl;
-}
 
 int init_sdl_window() {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) { // 初始化SDL
@@ -191,7 +123,7 @@ void handleFfmpegOperations() {
                 break;
             }
             // 像素格式刚好是YUV420P的，不用做像素格式转换
-            cout << "av_frame pts : " << av_frame->pts << " color format:" << av_frame->format << endl;
+//            cout << "av_frame pts : " << av_frame->pts << " color format:" << av_frame->format << endl;
 //            result = SDL_UpdateTexture(sdl_texture, nullptr, av_frame->data[0], av_frame->linesize[0]);
             result = SDL_UpdateYUVTexture(sdl_texture, nullptr,
                                           av_frame->data[0],
@@ -227,9 +159,6 @@ void handleFfmpegOperations() {
 }
 
 int main() {
-    //std::weak_ptr 用来避免 std::shared_ptr 的循环引用
-    test_loop_ref();
-    test_ring_buffer();
     cout << avformat_configuration() << endl; // 打印libavformat构建时配置信息。
 
     initFfmpeg();

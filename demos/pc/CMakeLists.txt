@@ -11,10 +11,13 @@ link_directories(${FFMPEG_DIR}/lib/
         ${SDL_DIR}/lib/)
 find_package(Threads REQUIRED)
 
-add_executable(pc main.cpp ../../lib/utils/test_shared_ptr.h ../../lib/utils/simple_ring_buffer.h)
+add_executable(utils test_utils.cpp ../../lib/utils/test_shared_ptr.h ../../lib/utils/simple_ring_buffer.h)
+add_executable(algorithm fuck_algorithm.cpp)
+add_executable(ffmpeg test_ffmpeg.cpp)
 
 #link_libraries(SDL2)
-target_link_libraries(pc PRIVATE SDL2
+
+target_link_libraries(ffmpeg PRIVATE SDL2
         avcodec
         avdevice
         avfilter
