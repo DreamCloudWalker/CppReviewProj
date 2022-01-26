@@ -14,6 +14,7 @@ find_package(Threads REQUIRED)
 add_executable(utils test_utils.cpp ../../lib/utils/test_shared_ptr.h ../../lib/utils/simple_ring_buffer.h)
 add_executable(algorithm fuck_algorithm.cpp)
 add_executable(ffmpeg test_ffmpeg.cpp)
+add_executable(multi-thread test_multithread.cpp)
 
 #link_libraries(SDL2)
 
