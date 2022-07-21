@@ -24,6 +24,8 @@ add_executable(algorithm fuck_algorithm.cpp)
 add_executable(ffmpeg test_ffmpeg.cpp)
 add_executable(multi-thread test_multithread.cpp)
 add_executable(coroutines test_coroutines.cpp)
+add_executable(fileio test_fileio.cpp)
+add_executable(log test_log.cpp ../../lib/utils/raii_log.h ../../lib/utils/raii_log.cpp)
 
 #link_libraries(SDL2)
 

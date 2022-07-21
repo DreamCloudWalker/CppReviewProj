@@ -73,7 +73,7 @@ int main() {
     // 并将其传递给对应的future， 即使这个future不在同一个线程中也可以安全的访问到这个值。
     std::promise<int> prom;
     std::future<int> fut = prom.get_future();
-    std::thread th1(print_future, std::ref(fut));
+    std::thread th1(print_future, std::ref(fut));   // 模板传参的时候使用ref，否则传参失败
     prom.set_value(10);
     th1.join();
 
